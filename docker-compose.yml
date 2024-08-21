@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: "{Dg2O)PZiCwrJB*"
+      POSTGRES_JDBC_URL: "jdbc:postgresql://postgres-db:5432/prodvizhenie"
+      SERVER_PORT: 8080
+  telegram-views-service:
+    build:
+      context: telegram-statistics-service
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    environment:
+      TELEGRAM_VIEWS_SERVICE_API_ID: 26870230
+      TELEGRAM_VIEWS_SERVICE_API_HASH: XXX
+      TELEGRAM_VIEWS_SERVICE_PHONE: +79647709381
+      TELEGRAM_VIEWS_SERVICE_PORT: 8081
+  #    restart: on-failure
+  postgres-db:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: prodvizhenie
+      POSTGRES_PASSWORD: "{Dg2O)PZiCwrJB*"
+      POSTGRES_USER: postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+volumes:
+  db-data:
+  bot-sessions:
